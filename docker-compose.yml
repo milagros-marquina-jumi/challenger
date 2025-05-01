@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    container_name: challenger-app
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/challenger
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+    networks:
+      - challenger-network
+    restart: on-failure
+
+  db:
+    image: postgres:15-alpine
+    container_name: challenger-db
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=challenger
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - challenger-network
+    restart: always
+
+networks:
+  challenger-network:
+    driver: bridge
+
+volumes:
+  postgres-data:
